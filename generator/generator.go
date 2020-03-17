@@ -27,6 +27,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"regexp"
 	"sort"
 	"strings"
 	"text/template"
@@ -49,6 +50,7 @@ type GeneratorOption struct {
 	CustomTypePackage string
 	FilenameSuffix    string
 	SingleFile        bool
+	SnakeCaseFile bool
 	Filename          string
 	Path              string
 }
@@ -63,6 +65,7 @@ func NewGenerator(loader Loader, opt GeneratorOption) *Generator {
 		customTypePackage:  opt.CustomTypePackage,
 		filenameSuffix:     opt.FilenameSuffix,
 		singleFile:         opt.SingleFile,
+		snakeCaseFile:opt.SnakeCaseFile,
 		filename:           opt.Filename,
 		path:               opt.Path,
 		files:              make(map[string]*os.File),
@@ -84,6 +87,7 @@ type Generator struct {
 	customTypePackage string
 	filenameSuffix    string
 	singleFile        bool
+	snakeCaseFile bool
 	filename          string
 	path              string
 
@@ -143,12 +147,21 @@ func (g *Generator) Generate(tableMap map[string]*internal.Type, ixMap map[strin
 	return nil
 }
 
+var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
+var matchAllCap   = regexp.MustCompile("([a-z0-9])([A-Z])")
+
 // getFile builds the filepath from the TBuf information, and retrieves the
 // file from files. If the built filename is not already defined, then it calls
 // the os.OpenFile with the correct parameters depending on the state of args.
 func (g *Generator) getFile(ds *basicDataSet, t *TBuf) (*os.File, error) {
 	// determine filename
 	var filename = strings.ToLower(t.Name) + g.filenameSuffix
+
+	if g.snakeCaseFile {
+		snake := matchFirstCap.ReplaceAllString(t.Name, "${1}_${2}")
+		snake  = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
+		filename = strings.ToLower(snake) + g.filenameSuffix
+	}
 	if g.singleFile {
 		filename = g.filename
 	}

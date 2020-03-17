@@ -92,6 +92,7 @@ var (
 				CustomTypePackage: rootOpts.CustomTypePackage,
 				FilenameSuffix:    rootOpts.Suffix,
 				SingleFile:        rootOpts.SingleFile,
+				SnakeCaseFile:rootOpts.SnakeCaseFile,
 				Filename:          rootOpts.Filename,
 				Path:              rootOpts.Path,
 			})
@@ -126,6 +127,8 @@ func setRootOpts(cmd *cobra.Command, opts *internal.ArgType) {
 	cmd.Flags().StringVar(&opts.TemplatePath, "template-path", "", "user supplied template path")
 	cmd.Flags().StringVar(&opts.Tags, "tags", "", "build tags to add to package header")
 	cmd.Flags().StringVar(&opts.InflectionRuleFile, "inflection-rule-file", "", "custom inflection rule file")
+
+	cmd.Flags().BoolVar(&opts.SnakeCaseFile, "snake-case-file", false, "snake case file")
 
 	helpFn := cmd.HelpFunc()
 	cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {

@@ -44,6 +44,8 @@ type ArgType struct {
 	// SingleFile when toggled changes behavior so that output is to one f ile.
 	SingleFile bool
 
+	SnakeCaseFile bool
+
 	// Package is the name used to generate package headers. If not specified,
 	// the name of the output directory will be used instead.
 	Package string
